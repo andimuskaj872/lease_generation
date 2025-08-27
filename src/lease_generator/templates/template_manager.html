@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Manager - Lease Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .nav-buttons {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .nav-btn {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            margin: 0 10px;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background-color: #545b62;
+        }
+        
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .template-card {
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8fff8;
+        }
+        
+        .template-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .template-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #28a745;
+            margin-bottom: 5px;
+        }
+        
+        .template-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .template-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        
+        .template-details {
+            background: white;
+            border-radius: 5px;
+            padding: 15px;
+            font-size: 12px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            display: none;
+        }
+        
+        .template-details.show {
+            display: block;
+        }
+        
+        .detail-section {
+            margin-bottom: 15px;
+        }
+        
+        .detail-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .detail-value {
+            color: #666;
+            margin-left: 10px;
+        }
+        
+        .list-value {
+            margin-left: 20px;
+            color: #666;
+        }
+        
+        .placeholder-highlight {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Template Manager</h1>
+        
+        <div class="nav-buttons">
+            <a href="/" class="nav-btn">← Back to Lease Generator</a>
+        </div>
+        
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">
+            View and understand the available lease templates. Click "Use Template" to load any template into the form.
+        </p>
+        
+        <div class="template-grid">
+            {% for template in templates %}
+            <div class="template-card">
+                <div class="template-header">
+                    <div>
+                        <div class="template-name">{{ template.name }}</div>
+                        {% if template.description %}
+                        <div class="template-description">{{ template.description }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="template-actions">
+                    <a href="/?template_name={{ template.name | urlencode }}" class="btn btn-primary">Use Template</a>
+                    <button onclick="toggleDetails('template-{{ loop.index }}')" class="btn btn-secondary">View Details</button>
+                    <a href="/templates/edit/{{ template.name | urlencode }}" class="btn btn-secondary">{% if template_manager.is_default_template(template.name) %}Copy{% else %}Edit{% endif %}</a>
+                </div>
+                
+                <div id="template-{{ loop.index }}" class="template-details">
+                    <div class="detail-section">
+                        <div class="detail-title">👥 Parties</div>
+                        <div class="detail-value">Landlord: 
+                            {% if "[Landlord Name]" in template.parties.landlord_name %}
+                                <span class="placeholder-highlight">{{ template.parties.landlord_name }}</span>
+                            {% else %}
+                                {{ template.parties.landlord_name }}
+                            {% endif %}
+                        </div>
+                        <div class="detail-value">Landlord Address: {{ template.parties.landlord_address }}</div>
+                        <div class="detail-value">Tenant: <span class="placeholder-highlight">{{ template.parties.tenant_name }}</span></div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <div class="detail-title">🏠 Property</div>
+                        <div class="detail-value">Address: {{ template.property_details.mailing_address }}</div>
+                        <div class="detail-value">Type: {{ template.property_details.residence_type }}</div>
+                        <div class="detail-value">Bedrooms: {{ template.property_details.bedrooms }}</div>
+                        <div class="detail-value">Bathrooms: {{ template.property_details.bathrooms }}</div>
+                        <div class="detail-value">Furnished: {{ "Yes" if template.property_details.furnished else "No" }}</div>
+                        {% if template.property_details.appliances %}
+                        <div class="detail-value">Appliances:</div>
+                        {% for appliance in template.property_details.appliances %}
+                        <div class="list-value">• {{ appliance }}</div>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    
+                    <div class="detail-section">
+                        <div class="detail-title">💰 Lease Terms</div>
+                        <div class="detail-value">Monthly Rent: ${{ "%.2f"|format(template.lease_terms.monthly_rent) }}</div>
+                        <div class="detail-value">Security Deposit: ${{ "%.2f"|format(template.lease_terms.security_deposit) }}</div>
+                        {% if template.lease_terms.pet_deposit %}
+                        <div class="detail-value">Pet Deposit: ${{ "%.2f"|format(template.lease_terms.pet_deposit) }}</div>
+                        {% endif %}
+                        <div class="detail-value">Late Fee: ${{ "%.2f"|format(template.lease_terms.late_fee) }}</div>
+                        <div class="detail-value">NSF Fee: ${{ "%.2f"|format(template.lease_terms.nsf_fee) }}</div>
+                        <div class="detail-value">Payment: {{ template.lease_terms.payment_instructions[:80] }}{% if template.lease_terms.payment_instructions|length > 80 %}...{% endif %}</div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <div class="detail-title">🚗 Property Features</div>
+                        {% if template.property_features.parking_spaces %}
+                        <div class="detail-value">Parking: {{ template.property_features.parking_spaces }} space{% if template.property_features.parking_spaces > 1 %}s{% endif %}</div>
+                        {% endif %}
+                        {% if template.property_features.utilities_included %}
+                        <div class="detail-value">Utilities Included:</div>
+                        {% for utility in template.property_features.utilities_included %}
+                        <div class="list-value">• {{ utility }}</div>
+                        {% endfor %}
+                        {% endif %}
+                        <div class="detail-value">Smoking: {{ "Allowed" if template.property_features.smoking_allowed else "Prohibited" }}</div>
+                        <div class="detail-value">Pets: {{ "Allowed" if template.property_features.pets_allowed else "Not Allowed" }}</div>
+                        <div class="detail-value">Waterbeds: {{ "Allowed" if template.property_features.waterbed_allowed else "Prohibited" }}</div>
+                    </div>
+                    
+                    {% if template.additional_terms.special_conditions %}
+                    <div class="detail-section">
+                        <div class="detail-title">📋 Special Conditions</div>
+                        {% for condition in template.additional_terms.special_conditions %}
+                        <div class="list-value">• {{ condition }}</div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="detail-section">
+                        <div class="detail-title">⚖️ Legal</div>
+                        <div class="detail-value">Governing State: {{ template.governing_law_state }}</div>
+                        <div class="detail-value">Lead Paint Disclosure: {{ "Required" if template.lead_paint_disclosure else "Not Required" }}</div>
+                        <div class="detail-value">Early Termination Notice: {{ template.additional_terms.early_termination_notice }} days</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div style="text-align: center; padding-top: 20px; border-top: 2px solid #eee; color: #666;">
+            <p><strong>Note:</strong> Templates with <span class="placeholder-highlight">[Placeholder Text]</span> will need to be filled in when you use the template.</p>
+            <p>You can modify these templates by editing <code>src/lease_generator/templates.py</code></p>
+        </div>
+    </div>
+    
+    <script>
+        function toggleDetails(templateId) {
+            const details = document.getElementById(templateId);
+            if (details.classList.contains('show')) {
+                details.classList.remove('show');
+            } else {
+                // Hide all other details first
+                document.querySelectorAll('.template-details.show').forEach(el => {
+                    el.classList.remove('show');
+                });
+                details.classList.add('show');
+            }
+        }
+    </script>
+</body>
+</html>

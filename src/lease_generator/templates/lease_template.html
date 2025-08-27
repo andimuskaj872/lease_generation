@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Lease Agreement</title>
+    <style>
+        body {
+            font-family: Times, "Times New Roman", serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            margin: 40px;
+            color: #000;
+        }
+        
+        h1 {
+            text-align: center;
+            text-decoration: underline;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .checkbox {
+            font-family: monospace;
+        }
+        
+        .signature-section {
+            margin-top: 40px;
+            page-break-inside: avoid;
+        }
+        
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .payment-table th,
+        .payment-table td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        .payment-table th {
+            background-color: #f0f0f0;
+        }
+        
+        .underline {
+            text-decoration: underline;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>LEASE AGREEMENT</h1>
+    
+    <div class="section-title">1. THE PARTIES</div>
+    <p>This Residential Lease Agreement ("Agreement") made this {{ agreement_date }} is between:</p>
+    
+    <p><strong>Landlord</strong>: {{ parties.landlord_name }} with a mailing address of {{ parties.landlord_address }} ("Landlord"), AND</p>
+    
+    <p><strong>Tenant(s)</strong>: {{ parties.tenant_name }} ("Tenant").</p>
+    
+    <p>Landlord and Tenant are each referred to herein as a "Party" and, collectively, as the "Parties."</p>
+    
+    <p>NOW, THEREFORE, FOR AND IN CONSIDERATION of the mutual promises and agreements contained herein, the Tenant agrees to lease the Premises from the Landlord under the following terms and conditions:</p>
+    
+    <div class="section-title">2. LEASE TYPE</div>
+    <p>This Agreement shall be considered a fixed lease. The Tenant shall be allowed to occupy the Premises starting on {{ lease_terms.start_date }} and ending on {{ lease_terms.end_date }} ("Lease Term"). At the end of the Lease Term and no renewal is made, the Tenant may continue to lease the Premises under the same terms of this Agreement under a month-to-month arrangement.</p>
+    
+    <div class="section-title">3. OCCUPANT(S)</div>
+    <p>The Premises is to be occupied strictly as a residential dwelling with the following individual(s) in addition to the Tenant: (check one)</p>
+    {% if parties.has_occupants and parties.occupants %}
+    <p><span class="checkbox">☑</span> - {{ parties.occupants }} ("Occupant(s)")</p>
+    <p><span class="checkbox">☐</span> - There are no Occupant(s).</p>
+    {% else %}
+    <p><span class="checkbox">☐</span> - ____________________________("Occupant(s)")</p>
+    <p><span class="checkbox">☑</span> - There are no Occupant(s).</p>
+    {% endif %}
+    
+    <div class="section-title">4. THE PROPERTY</div>
+    <p>The Landlord agrees to lease the described property below to the Tenant:</p>
+    <p>1) Mailing Address: {{ property_details.mailing_address }}<br>
+    2) Residence Type: {{ property_details.residence_type }}<br>
+    3) Bedroom(s): {{ property_details.bedrooms }}<br>
+    4) Bathroom(s): {{ property_details.bathrooms }}</p>
+    
+    <p>The aforementioned property shall be leased wholly by the Tenant ("Premises").</p>
+    
+    <div class="section-title">5. PURPOSE</div>
+    <p>The Tenant and Occupant(s) may only use the Premises as a residential dwelling only.</p>
+    
+    <div class="section-title">6. FURNISHINGS</div>
+    <p>The Premises is {{ 'furnished' if property_details.furnished else 'not furnished' }}.</p>
+    
+    <div class="section-title">7. APPLIANCES</div>
+    <p>The Landlord shall provide the following appliances:</p>
+    <ul>
+        {% for appliance in property_details.appliances %}
+        <li>{{ appliance }}</li>
+        {% endfor %}
+    </ul>
+    
+    <div class="section-title">8. RENT</div>
+    <p>The Tenant shall pay the Landlord, in equal monthly installments of {{ lease_terms.monthly_rent|currency }} ("Rent"). The Rent shall be due on the first (1st) of every month ("Due Date") and paid under the following instructions:</p>
+    <p>{{ lease_terms.payment_instructions }}</p>
+    
+    <div class="section-title">9. NON-SUFFICIENT FUNDS (NSF CHECKS)</div>
+    <p>If the Tenant pays the Rent with a check that is not honored due to insufficient funds (NSF), there shall be a fee of {{ lease_terms.nsf_fee|currency }} per incident.</p>
+    
+    <div class="section-title">10. LATE FEE</div>
+    <p>If Rent is not paid on the Due Date, there shall be a penalty of {{ lease_terms.late_fee|currency }} due as a one (1) Time Payment. Rent is considered late when it has not been paid on the Due Date.</p>
+    
+    <div class="section-title">11. SECURITY DEPOSIT</div>
+    {% if lease_terms.security_deposit_details and lease_terms.security_deposit_details.use_custom_section %}
+    {% set security_amount = lease_terms.custom_security_deposit or lease_terms.monthly_rent %}
+    {% set amount_paid = lease_terms.security_deposit_details.previous_rent or 0 %}
+    {% set amount_due = security_amount - amount_paid %}
+    <p>As part of this Agreement the Landlord requires a payment in the amount of {{ security_amount|currency }} ("Security Deposit") for the faithful performance of the Tenant under the terms and conditions of this Agreement. 
+    {% if amount_paid > 0 %}
+    Tenant has already paid {{ amount_paid|currency }} towards their security deposit. 
+    {% endif %}
+    {% if amount_due > 0 %}
+    An additional {{ amount_due|currency }} of the Security Deposit is required by the Tenant on {{ lease_terms.start_date }}. 
+    {% endif %}
+    The Security Deposit shall be returned to the Tenant within 7 days after the end of the Lease Term less any itemized deductions. This Security Deposit shall not be credited towards any Rent unless the Landlord gives their written consent.</p>
+    {% else %}
+    {% set security_amount = lease_terms.custom_security_deposit or lease_terms.monthly_rent %}
+    <p>As part of this Agreement the Landlord requires a payment in the amount of {{ security_amount|currency }} ("Security Deposit") for the faithful performance of the Tenant under the terms and conditions of this Agreement. The Security Deposit shall be returned to the Tenant within 7 days after the end of the Lease Term less any itemized deductions. This Security Deposit shall not be credited towards any Rent.</p>
+    {% endif %}
+    
+    {% if property_features.parking_spaces %}
+    <div class="section-title">12. PARKING</div>
+    <p>The Landlord shall provide {{ property_features.parking_spaces }} parking space{% if property_features.parking_spaces > 1 %}s{% if property_features.parking_spaces == 2 %}, vertical (i.e. back to back){% endif %}{% endif %} to the Tenant for no additional fee.</p>
+    {% endif %}
+    
+    <div class="section-title">13. SALE OF PROPERTY</div>
+    <p>If the Premises is sold, the Tenant is to be notified of the new Owner, and if there is a new Manager, their contact details for repairs and maintenance shall be forwarded. If the Premises is conveyed to another party, the new owner has the right to terminate this Agreement by providing 60 days' notice to the Tenant.</p>
+    
+    <div class="section-title">14. UTILITIES</div>
+    <p>The Landlord shall provide the following utilities and services to the Tenant:</p>
+    <ul>
+        {% for utility in property_features.utilities_included %}
+        <li>{{ utility }}</li>
+        {% endfor %}
+    </ul>
+    <p>Any other utilities or services not mentioned will be the responsibility of the Tenant.</p>
+    
+    <div class="section-title">15. EARLY TERMINATION</div>
+    <p>The Tenant shall have the right to terminate this Agreement at any time by providing at least {{ additional_terms.early_termination_notice }} days' written notice to the Landlord. The Tenant will still be responsible for payment of rent and utilities until the end of the lease or until the Landlord finds a new tenant.</p>
+    
+    <div class="section-title">16. SMOKING POLICY</div>
+    <p>Smoking is {{ 'permitted' if property_features.smoking_allowed else 'prohibited' }} on the Premises and Common Areas.</p>
+    
+    <div class="section-title">17. PETS</div>
+    <p>{% if property_features.pets_allowed %}The Tenant shall have the right to have pet(s) on a case by case basis with the written permission of the landlord. {% if lease_terms.pet_deposit %}For the right to have pet(s) on the Premises the Landlord shall charge a pet-deposit fee of {{ lease_terms.pet_deposit|currency }}. {% endif %}The Tenant is responsible for all damage that any pet causes, regardless of ownership of said pet and agrees to restore the Premises to its original condition at their expense.{% else %}Pets are not allowed on the Premises.{% endif %}</p>
+    
+    <div class="section-title">18. WATERBEDS</div>
+    <p>The Tenant shall {{ 'have' if property_features.waterbed_allowed else 'not have' }} the right to use a waterbed on the Premises.</p>
+    
+    <div class="section-title">19. NOTICES</div>
+    <p>Any notice to be sent by the Landlord or the Tenant to each other shall use the following addresses:</p>
+    <p><strong>Landlord's Address</strong>: {{ parties.landlord_address }}<br>
+    {% if additional_terms.landlord_contact_email %}
+    OR<br>
+    <strong>Landlord's Email Address:</strong> {{ additional_terms.landlord_contact_email }}
+    {% endif %}</p>
+    
+    {% if parties.tenant_address %}
+    <p><strong>Tenant's Mailing Address</strong>: {{ parties.tenant_address }}<br>
+    {% if parties.tenant_email %}
+    OR<br>
+    <strong>Tenant's Email Address</strong>: {{ parties.tenant_email }}
+    {% endif %}</p>
+    {% endif %}
+    
+    {% if additional_terms.landlord_contact_phone or additional_terms.landlord_contact_email %}
+    <div class="section-title">20. AGENT/MANAGER</div>
+    <p>The Landlord does not have a manager on the Premises although the Landlord can be contacted for any maintenance or repair at:</p>
+    {% if additional_terms.landlord_contact_phone %}<p>Telephone: {{ additional_terms.landlord_contact_phone }}</p>{% endif %}
+    {% if additional_terms.landlord_contact_email %}<p>E-Mail: {{ additional_terms.landlord_contact_email }}</p>{% endif %}
+    {% endif %}
+    
+    <div class="section-title">21. POSSESSION</div>
+    <p>Tenant has examined the condition of the Premises and by taking possession acknowledges that they have accepted the Premises in good order and in its current condition except as herein otherwise stated. Failure of the Landlord to deliver possession of the Premises at the start of the Lease Term to the Tenant shall terminate this Agreement at the option of the Tenant. Furthermore, under such failure to deliver possession by the Landlord, and if the Tenant cancels this Agreement, the Security Deposit (if any) shall be returned to the Tenant along with any other pre-paid rent and fees.</p>
+
+    <div class="section-title">22. ACCESS</div>
+    <p>Upon the beginning of the Proration Period or the start of the Lease Term, whichever is earlier, the Landlord agrees to give access to the Tenant in the form of keys as needed to enter the common areas and the Premises. Duplicate copies of the access provided may only be authorized under the consent of the Landlord and, if any replacements are needed, the Landlord may provide them for a $50 fee. At the end of this Agreement all access provided to the Tenant shall be returned to the Landlord or a $50 fee will be charged to the Tenant or the fee will be subtracted from the Security Deposit.</p>
+
+    <div class="section-title">23. SUBLETTING</div>
+    <p>The Tenant shall not be able to sublet the Premises without the written consent from the Landlord. The consent by the Landlord to one subtenant shall not be deemed to be consent to any subsequent subtenant.</p>
+
+    <div class="section-title">24. ABANDONMENT</div>
+    <p>If the Tenant vacates or abandons the Premises, the Landlord shall have the right to terminate this Agreement immediately and remove all belongings including any personal property off of the Premises after 60 days of sending a written notice. If the Tenant vacates or abandons the Premises, the Landlord shall immediately have the right to terminate this Agreement.</p>
+
+    <div class="section-title">25. ASSIGNMENT</div>
+    <p>Tenant shall not assign this Lease without the prior written consent of the Landlord. The consent by the Landlord to one assignment shall not be deemed to be consent to any subsequent assignment.</p>
+
+    <div class="section-title">26. RIGHT OF ENTRY</div>
+    <p>The Landlord shall have the right to enter the Premises during normal working hours by providing at least forty-eight (48) hours notice for entry between the hours of 9 a.m. and 9 p.m. in order for inspecting the Premises, making necessary repairs, alterations or improvements, to supply services as agreed or for any reasonable purpose. The Landlord may exhibit the Premises to prospective purchasers, mortgagees, or lessees upon reasonable notice.</p>
+
+    <div class="section-title">27. MAINTENANCE, REPAIRS, OR ALTERATIONS</div>
+    <p>The Tenant shall, at their own expense and at all times, maintain premises in a clean and sanitary manner, and shall surrender the same at termination hereof, in as good condition as received, normal wear and tear excepted. The Tenant may not make any alterations to the leased premises without the consent in writing of the Landlord. The Landlord shall be responsible for repairs to the interior and exterior of the building.</p>
+
+    <div class="section-title">28. NOISE/WASTE</div>
+    <p>The Tenant agrees not to commit waste on the premises, maintain, or permit to be maintained, a nuisance thereon, or use, or permit the premises to be used, in an unlawful manner. The Tenant further agrees to abide by any and all local, county, and State noise ordinances.</p>
+
+    <div class="section-title">29. GUESTS</div>
+    <p>There shall be no other persons living on the Premises other than the Tenant and any Occupant(s).</p>
+
+    <div class="section-title">30. COMPLIANCE WITH LAW</div>
+    <p>The Tenant agrees that during the term of the Agreement, to promptly comply with any present and future laws, ordinances, orders, rules, regulations, and requirements of the Federal, State, County, City, and Municipal government or any of their departments, bureaus, boards, commissions and officials thereof with respect to the premises, or the use or occupancy thereof, whether said compliance shall be ordered or directed to or against the Tenant, the Landlord, or both.</p>
+
+    <div class="section-title">31. DEFAULT</div>
+    <p>If the Tenant fails to comply with any of the financial or material provisions of this Agreement, or of any present rules and regulations or any that may be hereafter prescribed by the Landlord, or materially fails to comply with any duties imposed on the Tenant by statute or State laws, within the time period after delivery of written notice by the Landlord specifying the non-compliance and indicating the intention of the Landlord to terminate the Agreement by reason thereof, the Landlord may terminate this Agreement. If the Tenant fails to pay rent when due and the default continues for the time-period specified in the written notice thereafter, the Landlord may, at their option, declare the entire balance (compiling all months applicable to this Agreement) of rent payable hereunder to be immediately due and payable and may exercise any and all rights and remedies available to the Landlord at law or in equity and may immediately terminate this Agreement.</p>
+    
+    <p>The Tenant will be in default if: (a) Tenant does not pay rent or other amounts that are owed; (b) Tenant, their guests, or the Occupant(s) violate this Agreement, rules, or fire, safety, health, or criminal laws, regardless of whether arrest or conviction occurs; (c) Tenant abandons the Premises; (d) Tenant gives incorrect or false information in the rental application; (e) Tenant, or any Occupant(s) is arrested, convicted, or given deferred adjudication for a criminal offense involving actual or potential physical harm to a person, or involving possession, manufacture, or delivery of a controlled substance, marijuana, or drug paraphernalia under state statute; (f) any illegal drugs or paraphernalia are found in the Premises or on the person of the Tenant, guests, or Occupant(s) while on the Premises and/or; (g) as otherwise allowed by law.</p>
+
+    <div class="section-title">32. MULTIPLE TENANT OR OCCUPANT(S)</div>
+    <p>Each individual that is considered a Tenant is jointly and individually liable for all of this Agreement's obligations, including but not limited to rent monies. If any Tenant, guest, or Occupant(s) violates this Agreement, the Tenant is considered to have violated this Agreement. Landlord's requests and notices to the Tenant or any of the Occupant(s) of legal age constitutes notice to the Tenant. Notices and requests from the Tenant or any one of the Occupant(s) (including repair requests and entry permissions) constitutes notice from the Tenant. In eviction suits, the Tenant is considered the agent of the Premise for the service of process.</p>
+
+    <div class="section-title">33. DISPUTES</div>
+    <p>If a dispute arises during or after the term of this Agreement between the Landlord and Tenant, they shall agree to hold negotiations amongst themselves, in "good faith", before any litigation.</p>
+
+    <div class="section-title">34. SEVERABILITY</div>
+    <p>If any provision of this Agreement or the application thereof shall, for any reason and to any extent, be invalid or unenforceable, neither the remainder of this Agreement nor the application of the provision to other persons, entities or circumstances shall be affected thereby, but instead shall be enforced to the maximum extent permitted by law.</p>
+
+    <div class="section-title">35. SURRENDER OF PREMISES</div>
+    <p>The Tenant has surrendered the Premises when (a) the move-out date has passed and no one is living in the Premise within the Landlord's reasonable judgment; or (b) Access to the Premise have been turned in to Landlord – whichever comes first. Upon the expiration of the term hereof, the Tenant shall surrender the Premise in better or equal condition as it were at the commencement of this Agreement, reasonable use, wear and tear thereof, and damages by the elements excepted.</p>
+
+    <div class="section-title">36. RETALIATION</div>
+    <p>The Landlord is prohibited from making any type of retaliatory acts against the Tenant including but not limited to restricting access to the Premises, decreasing or cancelling services or utilities, failure to repair appliances or fixtures, or any other type of act that could be considered unjustified.</p>
+
+    <div class="section-title">37. WAIVER</div>
+    <p>A Waiver by the Landlord for a breach of any covenant or duty by the Tenant, under this Agreement is not a waiver for a breach of any other covenant or duty by the Tenant, or of any subsequent breach of the same covenant or duty. No provision of this Agreement shall be considered waived unless such a waiver shall be expressed in writing as a formal amendment to this Agreement and executed by the Tenant and Landlord.</p>
+
+    <div class="section-title">38. EQUAL HOUSING</div>
+    <p>If the Tenant possesses any mental or physical impairment, the Landlord shall provide reasonable modifications to the Premises unless the modifications would be too difficult or expensive for the Landlord to provide. Any impairment(s) of the Tenant are encouraged to be provided and presented to the Landlord in writing in order to seek the most appropriate route for providing the modifications to the Premises.</p>
+
+    <div class="section-title">39. HAZARDOUS MATERIALS</div>
+    <p>The Tenant agrees to not possess any type of personal property that could be considered a fire hazard such as a substance having flammable or explosive characteristics on the Premises. Items that are prohibited to be brought into the Premises, other than for everyday cooking or the need of an appliance, includes but is not limited to gas (compressed), gasoline, fuel, propane, kerosene, motor oil, fireworks, or any other related content in the form of a liquid, solid, or gas.</p>
+
+    <div class="section-title">40. INDEMNIFICATION</div>
+    <p>The Landlord shall not be liable for any damage or injury to the Tenant, or any other person, or to any property, occurring on the Premises, or any part thereof, or in common areas thereof, and the Tenant agrees to hold the Landlord harmless from any claims or damages unless caused solely by the Landlord's negligence. It is recommended that renter's insurance be purchased at the Tenant's expense.</p>
+
+    <div class="section-title">41. COVENANTS</div>
+    <p>The covenants and conditions herein contained shall apply to and bind the heirs, legal representatives, and assigns of the parties hereto, and all covenants are to be construed as conditions of this Agreement.</p>
+
+    <div class="section-title">42. PREMISES DEEMED UNINHABITABLE</div>
+    <p>If the Premises is deemed uninhabitable due to damage beyond reasonable repair the Tenant will be able to terminate this Agreement by written notice to the Landlord. If said damage was due to the negligence of the Tenant, the Tenant shall be liable to the Landlord for all repairs and for the loss of income due to restoring the Premises back to a livable condition in addition to any other losses that can be proved by the Landlord.</p>
+
+    {% if lead_paint_disclosure %}
+    <div class="section-title">43. LEAD PAINT</div>
+    <p>The Premises was built prior to 1978 and there is an attachment titled the 'Lead-Based Paint Disclosure' that must be initialed and signed by the Landlord and Tenant.</p>
+    {% endif %}
+
+    <div class="section-title">44. GOVERNING LAW</div>
+    <p>This Agreement is to be governed under the laws located in the State of {{ governing_law_state }}.</p>
+    
+    {% if additional_terms.special_conditions %}
+    <div class="section-title">45. ADDITIONAL TERMS AND CONDITIONS</div>
+    <ul style="list-style-type: none; padding-left: 0;">
+        {% for condition in additional_terms.special_conditions %}
+        {% if condition is string %}
+        <li style="margin-bottom: 15px;">{{ condition }}</li>
+        {% else %}
+        <li style="margin-bottom: 15px;">{{ condition.title }}
+        {% if condition.items %}
+        <ul style="list-style-type: none; margin-top: 5px; margin-left: 20px; padding-left: 0;">
+            {% for item in condition.items %}
+            <li>{{ item }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+    {% endif %}
+    
+    {% if additional_terms.payment_schedule and additional_terms.payment_schedule.include_in_lease %}
+    <div class="section-title">46. PAYMENT SCHEDULE</div>
+    {% if additional_terms.payment_schedule.custom_entries %}
+    <table class="payment-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Due Date</th>
+                <th>Rent</th>
+                <th>Security & Pet Deposit</th>
+                <th>Total</th>
+                <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in additional_terms.payment_schedule.custom_entries %}
+            <tr>
+                <td>{% if entry.entry_number %}{{ entry.entry_number }}{% endif %}</td>
+                <td>{% if entry.due_date is string %}{{ entry.due_date }}{% else %}{{ entry.due_date.strftime('%m/%d/%Y') if entry.due_date else '' }}{% endif %}</td>
+                <td>{{ entry.rent_amount|currency }}</td>
+                <td>{{ (entry.security_deposit + entry.pet_deposit)|currency }}</td>
+                <td>{{ entry.total|currency }}</td>
+                <td>{{ entry.comment or '' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+    {% endif %}
+    
+    <div class="section-title">47. ENTIRE AGREEMENT</div>
+    <p>This Agreement contains all the terms agreed to by the parties relating to its subject matter including any attachments or addendums. This Agreement replaces all previous discussions, understandings, and oral agreements. The Landlord and Tenant agree to the terms and conditions and shall be bound until the end of the Lease Term.</p>
+    
+    <div class="signature-section">
+        <p><strong>Landlord's Signature</strong> _________________________ Date: ____________</p>
+        <p>Print Name: ________________</p>
+        <br>
+        <p><strong>Tenant's Signature</strong> _________________________ Date: ____________</p>
+        <p>Print Name: ________________</p>
+        <br>
+        <p><strong>Tenant's Signature</strong> _________________________ Date: ____________</p>
+        <p>Print Name: ________________</p>
+        <br>
+        <p><strong>Agent's Signature</strong> _________________________ Date: ____________</p>
+        <p>Print Name: ________________</p>
+    </div>
+    
+    {% if lead_paint_disclosure %}
+    <div class="page-break">
+        <h2>Disclosure of Information on Lead-Based Paint and/or Lead-Based Paint Hazards</h2>
+        
+        <div class="section-title">1. Lead Warning Statement</div>
+        <p>Housing built before 1978 may contain lead-based paint. Lead from paint, paint chips, and dust can pose health hazards if not managed properly. Lead exposure is especially harmful to young children and pregnant women. Before renting pre-1978 housing, landlords must disclose the presence of known lead-based paint and/or lead-based paint hazards in the dwelling. Tenants must also receive a federally approved pamphlet on lead poisoning prevention.</p>
+        
+        <div class="section-title">2. Lessor's Disclosure</div>
+        <p>1) Presence of lead-based paint and/or lead-based paint hazards (check one below):<br>
+        <span class="checkbox">☐</span> - Known lead-based paint and/or lead-based paint hazards are present in the housing.<br>
+        <span class="checkbox">☑</span> - Landlord has no knowledge of lead-based paint and/or lead-based paint hazards in the housing.</p>
+        
+        <p>2) Records and reports available to the landlord (check one below)<br>
+        <span class="checkbox">☐</span> - Landlord has provided the tenant with all available records and reports pertaining to lead-based paint and/or lead-based paint hazards in the housing (list documents below).<br>
+        <span class="checkbox">☑</span> - Landlord has no reports or records pertaining to lead-based paint and/or lead-based paint hazards in the housing.</p>
+        
+        <div class="section-title">3. Tenant's Acknowledgement</div>
+        <p><span class="checkbox">☐</span> - Tenant has received copies of all information listed above.<br>
+        <span class="checkbox">☑</span> - Tenant has received the pamphlet "Protect Your Family From Lead in Your Home".</p>
+        
+        <div class="section-title">4. Broker's Acknowledgement</div>
+        <p><span class="checkbox">☐</span> - Broker has informed the tenant of the tenant's obligations under 42 USC 4852(d) and is aware of his/her responsibility to ensure compliance.</p>
+        
+        <div class="section-title">5. Certification of Accuracy</div>
+        <p>The following parties have reviewed the information above and certify, to the best of their knowledge, that the information they have provided is true and accurate.</p>
+        
+        <div class="signature-section">
+            <p><strong>Landlord's Signature</strong> _________________________ Date: ____________</p>
+            <p>Print Name: ________________</p>
+            <br>
+            <p><strong>Tenant's Signature</strong> _________________________ Date: ____________</p>
+            <p>Print Name: ________________</p>
+            <br>
+            <p><strong>Tenant's Signature</strong> _________________________ Date: ____________</p>
+            <p>Print Name: ________________</p>
+            <br>
+            <p><strong>Agent's Signature</strong> _________________________ Date: ____________</p>
+            <p>Print Name: ________________</p>
+        </div>
+    </div>
+    {% endif %}
+</body>
+</html>

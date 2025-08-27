@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lease Agreement Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-section {
+            margin-bottom: 40px;
+            border-left: 4px solid #007bff;
+            padding-left: 20px;
+        }
+        
+        .form-section h2 {
+            color: #007bff;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        input[type="checkbox"] {
+            width: auto;
+            transform: scale(1.2);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .submit-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .output-format {
+            margin-bottom: 20px;
+        }
+        
+        .format-options {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        
+        .format-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        input[type="radio"] {
+            width: auto;
+            transform: scale(1.2);
+        }
+        
+        .submit-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .help-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .config-section {
+            background-color: #e8f4f8;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .template-section {
+            background-color: #f0f8f0;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .config-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .config-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .config-item:hover {
+            border-color: #007bff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .config-item.selected {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        
+        .template-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #28a745;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .template-item:hover {
+            border-color: #1e7e34;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .template-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .config-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .config-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .config-meta {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .config-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lease Agreement Generator</h1>
+        
+        <!-- Template Upload Section -->
+        {% if not config_data %}
+        <div class="template-section">
+            <h3>📄 Upload JSON Template</h3>
+            <p>Load a previously saved configuration template:</p>
+            <form action="/templates/upload" method="post" enctype="multipart/form-data" style="margin-top: 15px;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="file" name="template_file" accept=".json" required style="flex: 1; padding: 10px; border: 2px solid #28a745; border-radius: 4px;">
+                    <button type="submit" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                        📤 Load Template
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+        
+        {% if upload_success %}
+        <div style="background-color: #d4edda; border: 2px solid #28a745; border-radius: 8px; padding: 15px; margin-bottom: 20px; color: #155724;">
+            <strong>✅ Success!</strong> {{ upload_success }}
+        </div>
+        {% endif %}
+        
+        {% if upload_error %}
+        <div style="background-color: #f8d7da; border: 2px solid #dc3545; border-radius: 8px; padding: 15px; margin-bottom: 20px; color: #721c24;">
+            <strong>❌ Error!</strong> {{ upload_error }}
+        </div>
+        {% endif %}
+        
+        {% if config_data %}
+        <div style="background-color: #e7f3ff; border: 2px solid #007bff; border-radius: 8px; padding: 15px; margin-bottom: 20px; color: #004085;">
+            <strong>📋 Template Loaded:</strong> Form is populated with template data
+            <div style="margin-top: 10px;">
+                <a href="/" style="background-color: #17a2b8; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-size: 14px; margin-right: 10px;">
+                    🔄 Replace Template
+                </a>
+                <button type="button" onclick="clearForm()" style="background-color: #6c757d; color: white; padding: 8px 16px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer;">
+                    🗑️ Clear Form
+                </button>
+            </div>
+        </div>
+        {% endif %}
+        
+        
+        <!-- Saved Configurations Section -->
+        {% if configurations %}
+        <div class="config-section">
+            <h3>📁 Your Saved Configurations</h3>
+            <p>Load one of your previously saved configurations:</p>
+            <div class="config-list">
+                {% for config in configurations %}
+                <div class="config-item" onclick="loadConfiguration('{{ config.id }}')">
+                    <div class="config-actions">
+                        <button type="button" class="btn btn-small btn-danger" onclick="event.stopPropagation(); deleteConfiguration('{{ config.id }}')">✕</button>
+                    </div>
+                    <div class="config-name">Configuration</div>
+                    <div class="config-meta">Created: {{ config.created_at[:10] }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <form action="/generate" method="post" id="leaseForm">
+            <div class="form-section">
+                <h2>Parties Information</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="landlord_name">Landlord Name *</label>
+                        <input type="text" id="landlord_name" name="landlord_name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tenant_name">Tenant Name *</label>
+                        <input type="text" id="tenant_name" name="tenant_name" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="landlord_address">Landlord Address *</label>
+                    <input type="text" id="landlord_address" name="landlord_address" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tenant_address">Tenant Address</label>
+                        <input type="text" id="tenant_address" name="tenant_address">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tenant_email">Tenant Email</label>
+                        <input type="email" id="tenant_email" name="tenant_email">
+                    </div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="has_occupants" name="has_occupants" onchange="toggleOccupants()">
+                        <label for="has_occupants">Property has additional occupants</label>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="occupants_group" style="display: none;">
+                    <label for="occupants">Additional Occupants</label>
+                    <textarea id="occupants" name="occupants" rows="3" placeholder="Enter names of additional occupants, separated by commas or new lines"></textarea>
+                    <div class="help-text">List all occupants who will live in the property in addition to the primary tenant</div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Property Details</h2>
+                
+                <div class="form-group">
+                    <label for="mailing_address">Property Address *</label>
+                    <input type="text" id="mailing_address" name="mailing_address" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="residence_type">Residence Type *</label>
+                        <select id="residence_type" name="residence_type" required>
+                            <option value="">Select type</option>
+                            <option value="House">House</option>
+                            <option value="Apartment">Apartment</option>
+                            <option value="Condo">Condo</option>
+                            <option value="Townhouse">Townhouse</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bedrooms">Bedrooms *</label>
+                        <input type="number" id="bedrooms" name="bedrooms" min="0" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="bathrooms">Bathrooms *</label>
+                        <input type="number" id="bathrooms" name="bathrooms" min="0" step="0.5" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="parking_spaces">Parking Spaces</label>
+                        <input type="number" id="parking_spaces" name="parking_spaces" min="0" value="0">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="appliances">Appliances Included</label>
+                    <input type="text" id="appliances" name="appliances" placeholder="Electric Stove, Refrigerator, Washer, Dryer">
+                    <div class="help-text">Separate multiple appliances with commas</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="utilities_included">Utilities Included</label>
+                    <input type="text" id="utilities_included" name="utilities_included" placeholder="Water, Sewer, Electricity">
+                    <div class="help-text">Separate multiple utilities with commas</div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="furnished" name="furnished">
+                        <label for="furnished">Furnished</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="smoking_allowed" name="smoking_allowed">
+                        <label for="smoking_allowed">Smoking Allowed</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="pets_allowed" name="pets_allowed">
+                        <label for="pets_allowed">Pets Allowed</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="waterbed_allowed" name="waterbed_allowed">
+                        <label for="waterbed_allowed">Waterbed Allowed</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Lease Terms</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="start_date">Start Date *</label>
+                        <input type="date" id="start_date" name="start_date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="end_date">End Date *</label>
+                        <input type="date" id="end_date" name="end_date" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="monthly_rent">Monthly Rent ($) *</label>
+                        <input type="number" id="monthly_rent" name="monthly_rent" step="0.01" min="0" required onchange="updateAmountPaid()">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="custom_security_deposit">Custom Security Deposit ($)</label>
+                        <input type="number" id="custom_security_deposit" name="custom_security_deposit" step="0.01" min="0" placeholder="Leave blank to use monthly rent amount">
+                        <div class="help-text">Default: Same as monthly rent. Only fill if different amount needed.</div>
+                    </div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="use_custom_security_deposit" name="use_custom_security_deposit" onchange="toggleCustomSecurityDeposit()">
+                        <label for="use_custom_security_deposit">🔧 Customize security deposit (for renewals/partial payments)</label>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="custom_security_deposit_section" style="display: none; background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-top: 15px;">
+                    <h4 style="color: #495057; margin-bottom: 15px;">Security Deposit Details</h4>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="security_deposit_amount_paid">Amount Already Paid ($)</label>
+                            <input type="number" id="security_deposit_amount_paid" name="security_deposit_amount_paid" step="0.01" min="0" value="0" readonly>
+                            <div class="help-text">Automatically set to previous rent amount (their previous security deposit)</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="previous_rent">Previous Monthly Rent ($)</label>
+                            <input type="number" id="previous_rent" name="previous_rent" step="0.01" min="0" placeholder="Enter previous rent amount" onchange="updateAmountPaid()">
+                            <div class="help-text">Amount due will be calculated automatically based on rent difference</div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pet_deposit">Pet Deposit ($)</label>
+                        <input type="number" id="pet_deposit" name="pet_deposit" step="0.01" min="0" value="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="late_fee">Late Fee ($)</label>
+                        <input type="number" id="late_fee" name="late_fee" step="0.01" min="0" value="20">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="payment_instructions">Payment Instructions *</label>
+                    <textarea id="payment_instructions" name="payment_instructions" required placeholder="Mail check to [Address] or PayPal to [email]"></textarea>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Additional Information</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="landlord_contact_phone">Landlord Phone</label>
+                        <input type="text" id="landlord_contact_phone" name="landlord_contact_phone">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="landlord_contact_email">Landlord Email</label>
+                        <input type="email" id="landlord_contact_email" name="landlord_contact_email">
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="early_termination_notice">Early Termination Notice (days)</label>
+                        <input type="number" id="early_termination_notice" name="early_termination_notice" min="1" value="30">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="governing_law_state">Governing Law State</label>
+                        <input type="text" id="governing_law_state" name="governing_law_state" value="Vermont">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="agreement_date">Agreement Date</label>
+                    <input type="date" id="agreement_date" name="agreement_date">
+                </div>
+                
+                <div class="form-group">
+                    <label for="special_conditions">Special Conditions/Additional Terms</label>
+                    <textarea id="special_conditions" name="special_conditions" placeholder="Enter any special conditions, one per line"></textarea>
+                </div>
+                
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="lead_paint_disclosure" name="lead_paint_disclosure">
+                        <label for="lead_paint_disclosure">Include Lead Paint Disclosure (for properties built before 1978)</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Payment Schedule</h2>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="include_payment_schedule" name="include_payment_schedule">
+                        <label for="include_payment_schedule">Include payment schedule in lease document</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="auto_generate_schedule" name="auto_generate_schedule" checked>
+                        <label for="auto_generate_schedule">Auto-generate monthly payments</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="rent_increases">Rent Increases (JSON format - optional)</label>
+                    <textarea id="rent_increases" name="rent_increases" rows="3" placeholder='[{"date": "2024-02-01", "new_rent": 1014.00, "comment": "2nd year lease starts"}]'></textarea>
+                    <small>Format: Array of objects with date, new_rent, and optional comment</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="lease_start_comment">Lease Start Date Comment (optional)</label>
+                    <input type="text" id="lease_start_comment" name="lease_start_comment" placeholder="e.g., First month rent plus security deposit increase">
+                    <small>Comment to display for the first monthly payment</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="custom_payments">Custom Payment Entries (JSON format - optional)</label>
+                    <textarea id="custom_payments" name="custom_payments" rows="5" placeholder='[{"due_date": "Lease signing", "rent_amount": 975, "security_deposit": 975, "pet_deposit": 250, "total": 2200, "comment": "First month, security, and pet deposit"}]'></textarea>
+                    <small>Format: Array of payment objects with due_date, amounts, and optional comment</small>
+                </div>
+            </div>
+            
+            <div class="submit-section">
+                <div class="output-format">
+                    <label>Output Format:</label>
+                    <div class="format-options">
+                        <div class="format-option">
+                            <input type="radio" id="format_html" name="output_format" value="html" checked>
+                            <label for="format_html">HTML Preview</label>
+                        </div>
+                        <div class="format-option">
+                            <input type="radio" id="format_pdf" name="output_format" value="pdf">
+                            <label for="format_pdf">PDF Download</label>
+                        </div>
+                        <div class="format-option">
+                            <input type="radio" id="format_renewal" name="output_format" value="renewal_message">
+                            <label for="format_renewal">Renewal Message (Text)</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">Generate Lease Agreement</button>
+                
+                <button type="button" id="downloadBtn" onclick="downloadConfiguration()" style="background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; width: auto; margin-top: 10px;">📥 Download Configuration JSON</button>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+        // Set today's date as default for agreement_date
+        document.getElementById('agreement_date').value = new Date().toISOString().split('T')[0];
+        
+        
+        // Load configuration data if provided
+        {% if config_data %}
+        const configData = {{ config_data | tojson }};
+        loadConfigurationData(configData);
+        {% endif %}
+        
+        function downloadConfiguration() {
+            // Create a form with the save_config flag set to true
+            const form = document.getElementById('leaseForm');
+            const formData = new FormData(form);
+            
+            // Add the save_config flag
+            formData.set('save_config', 'true');
+            
+            // Create a temporary form and submit it
+            const tempForm = document.createElement('form');
+            tempForm.method = 'POST';
+            tempForm.action = '/generate';
+            tempForm.style.display = 'none';
+            
+            // Add all form data to temp form
+            for (let [key, value] of formData.entries()) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value;
+                tempForm.appendChild(input);
+            }
+            
+            document.body.appendChild(tempForm);
+            tempForm.submit();
+            document.body.removeChild(tempForm);
+        }
+        
+        function loadConfiguration(configId) {
+            window.location.href = '/?config_id=' + configId;
+        }
+        
+        function clearForm() {
+            // Clear all form fields
+            document.getElementById('leaseForm').reset();
+            
+            // Hide occupants section
+            document.getElementById('occupants_group').style.display = 'none';
+            
+            // Reset checkboxes to default states
+            document.getElementById('furnished').checked = false;
+            document.getElementById('smoking_allowed').checked = false;
+            document.getElementById('pets_allowed').checked = false;
+            document.getElementById('waterbed_allowed').checked = false;
+            document.getElementById('lead_paint_disclosure').checked = false;
+            document.getElementById('use_custom_security_deposit').checked = false;
+            document.getElementById('has_occupants').checked = false;
+            document.getElementById('include_payment_schedule').checked = false;
+            document.getElementById('auto_generate_schedule').checked = true;
+            
+            // Hide custom security deposit section
+            document.getElementById('custom_security_group').style.display = 'none';
+            
+            // Clear any config-specific values
+            document.getElementById('output_format_html').checked = true;
+        }
+        
+        
+        function toggleOccupants() {
+            const checkbox = document.getElementById('has_occupants');
+            const occupantsGroup = document.getElementById('occupants_group');
+            
+            if (checkbox.checked) {
+                occupantsGroup.style.display = 'block';
+            } else {
+                occupantsGroup.style.display = 'none';
+                document.getElementById('occupants').value = '';
+            }
+        }
+        
+        function updateAmountPaid() {
+            const previousRent = parseFloat(document.getElementById('previous_rent').value) || 0;
+            const currentRent = parseFloat(document.getElementById('monthly_rent').value) || 0;
+            
+            document.getElementById('security_deposit_amount_paid').value = previousRent.toFixed(2);
+            
+            // Auto-populate lease start comment with calculated difference
+            if (previousRent > 0 && currentRent > previousRent) {
+                const difference = currentRent - previousRent;
+                const leaseStartCommentField = document.getElementById('lease_start_comment');
+                if (!leaseStartCommentField.value) { // Only update if field is empty
+                    leaseStartCommentField.value = `New lease first month rent plus $${difference.toLocaleString()} security deposit increase.`;
+                }
+            }
+        }
+        
+        function toggleCustomSecurityDeposit() {
+            const checkbox = document.getElementById('use_custom_security_deposit');
+            const customSection = document.getElementById('custom_security_deposit_section');
+            
+            if (checkbox.checked) {
+                customSection.style.display = 'block';
+            } else {
+                customSection.style.display = 'none';
+                // Reset values
+                document.getElementById('security_deposit_amount_paid').value = '0';
+                document.getElementById('previous_rent').value = '';
+            }
+        }
+        
+        function loadConfigurationData(data) {
+            // Load parties data
+            if (data.parties) {
+                setValue('landlord_name', data.parties.landlord_name);
+                setValue('landlord_address', data.parties.landlord_address);
+                setValue('tenant_name', data.parties.tenant_name);
+                setValue('tenant_address', data.parties.tenant_address);
+                setValue('tenant_email', data.parties.tenant_email);
+                setCheckbox('has_occupants', data.parties.has_occupants);
+                setValue('occupants', data.parties.occupants);
+                
+                // Show/hide occupants field based on checkbox
+                if (data.parties.has_occupants) {
+                    document.getElementById('occupants_group').style.display = 'block';
+                }
+            }
+            
+            // Load property details
+            if (data.property_details) {
+                setValue('mailing_address', data.property_details.mailing_address);
+                setValue('residence_type', data.property_details.residence_type);
+                setValue('bedrooms', data.property_details.bedrooms);
+                setValue('bathrooms', data.property_details.bathrooms);
+                setCheckbox('furnished', data.property_details.furnished);
+                setValue('appliances', data.property_details.appliances ? data.property_details.appliances.join(', ') : '');
+            }
+            
+            // Load lease terms
+            if (data.lease_terms) {
+                setValue('start_date', data.lease_terms.start_date);
+                setValue('end_date', data.lease_terms.end_date);
+                setValue('monthly_rent', data.lease_terms.monthly_rent);
+                setValue('custom_security_deposit', data.lease_terms.custom_security_deposit || '');
+                setValue('pet_deposit', data.lease_terms.pet_deposit || 0);
+                setValue('late_fee', data.lease_terms.late_fee || 20);
+                setValue('payment_instructions', data.lease_terms.payment_instructions);
+                
+                // Load security deposit details
+                if (data.lease_terms.security_deposit_details) {
+                    const details = data.lease_terms.security_deposit_details;
+                    setCheckbox('use_custom_security_deposit', details.use_custom_section);
+                    setValue('previous_rent', details.previous_rent || '');
+                    setValue('security_deposit_amount_paid', details.previous_rent || 0);
+                    
+                    // Show/hide custom section
+                    if (details.use_custom_section) {
+                        document.getElementById('custom_security_deposit_section').style.display = 'block';
+                    }
+                }
+            }
+            
+            // Load property features
+            if (data.property_features) {
+                setValue('parking_spaces', data.property_features.parking_spaces || 0);
+                setValue('utilities_included', data.property_features.utilities_included ? data.property_features.utilities_included.join(', ') : '');
+                setCheckbox('smoking_allowed', data.property_features.smoking_allowed);
+                setCheckbox('pets_allowed', data.property_features.pets_allowed);
+                setCheckbox('waterbed_allowed', data.property_features.waterbed_allowed);
+            }
+            
+            // Load additional terms
+            if (data.additional_terms) {
+                setValue('early_termination_notice', data.additional_terms.early_termination_notice || 30);
+                setValue('landlord_contact_phone', data.additional_terms.landlord_contact_phone);
+                setValue('landlord_contact_email', data.additional_terms.landlord_contact_email);
+                // Handle special conditions - convert objects to readable format
+                if (data.additional_terms.special_conditions) {
+                    const conditionsText = data.additional_terms.special_conditions.map(condition => {
+                        if (typeof condition === 'string') {
+                            return condition;
+                        } else if (condition && condition.title) {
+                            // Convert object to readable format
+                            let text = condition.title;
+                            if (condition.items && condition.items.length > 0) {
+                                text += '\n' + condition.items.map(item => '  - ' + item).join('\n');
+                            }
+                            return text;
+                        }
+                        return '';
+                    }).join('\n\n');
+                    setValue('special_conditions', conditionsText);
+                } else {
+                    setValue('special_conditions', '');
+                }
+                
+                // Load payment schedule data
+                if (data.additional_terms.payment_schedule) {
+                    setCheckbox('include_payment_schedule', data.additional_terms.payment_schedule.include_in_lease);
+                    setCheckbox('auto_generate_schedule', data.additional_terms.payment_schedule.auto_generate);
+                    
+                    if (data.additional_terms.payment_schedule.lease_start_comment) {
+                        setValue('lease_start_comment', data.additional_terms.payment_schedule.lease_start_comment);
+                    }
+                    
+                    if (data.additional_terms.payment_schedule.rent_increases) {
+                        setValue('rent_increases', JSON.stringify(data.additional_terms.payment_schedule.rent_increases, null, 2));
+                    }
+                    
+                    if (data.additional_terms.payment_schedule.custom_entries) {
+                        setValue('custom_payments', JSON.stringify(data.additional_terms.payment_schedule.custom_entries, null, 2));
+                    }
+                }
+            }
+            
+            // Load other fields
+            setValue('governing_law_state', data.governing_law_state || 'Vermont');
+            setCheckbox('lead_paint_disclosure', data.lead_paint_disclosure);
+        }
+        
+        function setValue(elementId, value) {
+            const element = document.getElementById(elementId);
+            if (element && value !== null && value !== undefined) {
+                element.value = value;
+            }
+        }
+        
+        function setCheckbox(elementId, checked) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.checked = Boolean(checked);
+            }
+        }
+        
+        async function deleteConfiguration(configId) {
+            if (confirm('Are you sure you want to delete this configuration?')) {
+                try {
+                    const response = await fetch(`/configurations/${configId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        // Reload the page to refresh the configuration list
+                        window.location.reload();
+                    } else {
+                        alert('Error deleting configuration');
+                    }
+                } catch (error) {
+                    alert('Error deleting configuration: ' + error.message);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

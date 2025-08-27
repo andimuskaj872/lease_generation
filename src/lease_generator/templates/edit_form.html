@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Lease Agreement</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .editor-container {
+            display: flex;
+            gap: 20px;
+            height: 70vh;
+        }
+        
+        .editor-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .preview-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px 5px 0 0;
+            font-weight: 600;
+        }
+        
+        #editor {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            padding: 15px;
+            resize: none;
+        }
+        
+        .preview-frame {
+            flex: 1;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .toolbar {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+        }
+        
+        .btn-success:hover {
+            background-color: #1e7e34;
+        }
+        
+        .section-selector {
+            margin-right: 10px;
+        }
+        
+        .section-selector select {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .help-text {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .editor-panel,
+            .preview-panel {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Lease Agreement</h1>
+        
+        <div class="help-text">
+            <strong>Editing Instructions:</strong>
+            <ul>
+                <li>Select a section from the dropdown to edit specific parts of the lease</li>
+                <li>Make your changes in the editor on the left</li>
+                <li>The preview will update automatically as you type</li>
+                <li>Use the toolbar buttons to save your changes or download the final document</li>
+            </ul>
+        </div>
+        
+        <div class="toolbar">
+            <div class="section-selector">
+                <select id="sectionSelect">
+                    <option value="parties">Parties Information</option>
+                    <option value="property">Property Details</option>
+                    <option value="lease_terms">Lease Terms</option>
+                    <option value="rent">Rent & Deposits</option>
+                    <option value="features">Property Features</option>
+                    <option value="additional">Additional Terms</option>
+                    <option value="full">Full Document</option>
+                </select>
+            </div>
+            <button class="btn" onclick="updatePreview()">Update Preview</button>
+            <button class="btn btn-secondary" onclick="resetSection()">Reset Section</button>
+            <button class="btn btn-success" onclick="downloadPDF()">Download PDF</button>
+            <button class="btn btn-secondary" onclick="goHome()">New Lease</button>
+        </div>
+        
+        <div class="editor-container">
+            <div class="editor-panel">
+                <div class="panel-header">Editor</div>
+                <textarea id="editor" placeholder="Select a section to edit..."></textarea>
+            </div>
+            
+            <div class="preview-panel">
+                <div class="panel-header">Preview</div>
+                <iframe id="preview" class="preview-frame" srcdoc="<p>Loading preview...</p>"></iframe>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sample lease data for editing (in a real app, this would come from the server)
+        const leaseData = {
+            parties: {
+                landlord_name: "John Doe",
+                landlord_address: "123 Main St, City, State 12345",
+                tenant_name: "Jane Smith",
+                tenant_address: "456 Oak Ave, City, State 12345",
+                tenant_email: "jane.smith@email.com"
+            },
+            property: {
+                mailing_address: "789 Elm Street, Unit 1, City, State 12345",
+                residence_type: "Apartment",
+                bedrooms: 2,
+                bathrooms: 1,
+                furnished: false,
+                appliances: ["Refrigerator", "Electric Stove", "Dishwasher"]
+            },
+            lease_terms: {
+                start_date: "2024-01-01",
+                end_date: "2024-12-31",
+                monthly_rent: 1200.00,
+                security_deposit: 1200.00,
+                payment_instructions: "Mail check to landlord address or pay via online portal"
+            },
+            features: {
+                parking_spaces: 1,
+                utilities_included: ["Water", "Sewer"],
+                smoking_allowed: false,
+                pets_allowed: true,
+                pet_deposit: 250.00
+            },
+            additional: {
+                early_termination_notice: 30,
+                landlord_contact_phone: "555-123-4567",
+                landlord_contact_email: "landlord@email.com",
+                special_conditions: [
+                    "No smoking in common areas",
+                    "Quiet hours: 10 PM - 8 AM"
+                ]
+            }
+        };
+        
+        const sectionTemplates = {
+            parties: `Landlord: {{landlord_name}}
+Address: {{landlord_address}}
+
+Tenant: {{tenant_name}}
+Address: {{tenant_address}}
+Email: {{tenant_email}}`,
+            
+            property: `Property Address: {{mailing_address}}
+Type: {{residence_type}}
+Bedrooms: {{bedrooms}}
+Bathrooms: {{bathrooms}}
+Furnished: {{furnished}}
+
+Appliances:
+{{#each appliances}}
+- {{this}}
+{{/each}}`,
+            
+            lease_terms: `Lease Start: {{start_date}}
+Lease End: {{end_date}}
+Monthly Rent: ${{monthly_rent}}
+Security Deposit: ${{security_deposit}}
+
+Payment Instructions:
+{{payment_instructions}}`,
+            
+            rent: `Monthly Rent: ${{monthly_rent}}
+Security Deposit: ${{security_deposit}}
+Pet Deposit: ${{pet_deposit}}
+Late Fee: ${{late_fee}}
+NSF Fee: ${{nsf_fee}}`,
+            
+            features: `Parking Spaces: {{parking_spaces}}
+
+Utilities Included:
+{{#each utilities_included}}
+- {{this}}
+{{/each}}
+
+Smoking Allowed: {{smoking_allowed}}
+Pets Allowed: {{pets_allowed}}
+Pet Deposit: ${{pet_deposit}}`,
+            
+            additional: `Early Termination Notice: {{early_termination_notice}} days
+Landlord Phone: {{landlord_contact_phone}}
+Landlord Email: {{landlord_contact_email}}
+
+Special Conditions:
+{{#each special_conditions}}
+- {{this}}
+{{/each}}`
+        };
+        
+        function loadSection(section) {
+            const editor = document.getElementById('editor');
+            if (section === 'full') {
+                // Load full HTML template for editing
+                editor.value = generateFullHTML();
+            } else if (sectionTemplates[section]) {
+                editor.value = renderTemplate(sectionTemplates[section], leaseData[section] || {});
+            }
+        }
+        
+        function renderTemplate(template, data) {
+            let result = template;
+            
+            // Simple template rendering
+            result = result.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+                return data[key] || '';
+            });
+            
+            // Handle arrays
+            result = result.replace(/\{\{#each (\w+)\}\}([\s\S]*?)\{\{\/each\}\}/g, (match, arrayName, itemTemplate) => {
+                const array = data[arrayName] || [];
+                return array.map(item => itemTemplate.replace(/\{\{this\}\}/g, item)).join('');
+            });
+            
+            return result;
+        }
+        
+        function generateFullHTML() {
+            return `<!DOCTYPE html>
+<html>
+<head>
+    <title>Lease Agreement</title>
+    <style>
+        body { font-family: Times, serif; margin: 40px; }
+        .section { margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>LEASE AGREEMENT</h1>
+    
+    <div class="section">
+        <strong>1. THE PARTIES</strong>
+        <p>Landlord: ${leaseData.parties.landlord_name}</p>
+        <p>Tenant: ${leaseData.parties.tenant_name}</p>
+    </div>
+    
+    <!-- Edit other sections here -->
+    
+</body>
+</html>`;
+        }
+        
+        function updatePreview() {
+            const editor = document.getElementById('editor');
+            const preview = document.getElementById('preview');
+            const section = document.getElementById('sectionSelect').value;
+            
+            if (section === 'full') {
+                preview.srcdoc = editor.value;
+            } else {
+                // For section editing, show a formatted preview
+                const content = `
+                    <html>
+                        <head>
+                            <style>
+                                body { font-family: Arial, sans-serif; padding: 20px; }
+                                pre { background: #f5f5f5; padding: 15px; border-radius: 5px; }
+                            </style>
+                        </head>
+                        <body>
+                            <h3>${section.toUpperCase()} SECTION</h3>
+                            <pre>${editor.value}</pre>
+                        </body>
+                    </html>
+                `;
+                preview.srcdoc = content;
+            }
+        }
+        
+        function resetSection() {
+            const section = document.getElementById('sectionSelect').value;
+            loadSection(section);
+            updatePreview();
+        }
+        
+        function downloadPDF() {
+            // In a real implementation, this would send the edited content to the server
+            // to generate a PDF
+            alert('PDF download functionality would be implemented here. In a real application, this would send the edited content to the server for PDF generation.');
+        }
+        
+        function goHome() {
+            window.location.href = '/';
+        }
+        
+        // Event listeners
+        document.getElementById('sectionSelect').addEventListener('change', function() {
+            loadSection(this.value);
+            updatePreview();
+        });
+        
+        document.getElementById('editor').addEventListener('input', function() {
+            // Auto-update preview with debouncing
+            clearTimeout(this.updateTimeout);
+            this.updateTimeout = setTimeout(updatePreview, 500);
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSection('parties');
+            updatePreview();
+        });
+    </script>
+</body>
+</html>
