@@ -13,12 +13,10 @@ from .models import (
     LeaseTerms, PropertyFeatures, AdditionalTerms, LeaseConfiguration,
     SecurityDepositDetails, PaymentEntry, PaymentSchedule
 )
-from .config_manager import ConfigurationManager
 
 app = FastAPI(title="Lease Generator", description="Generate residential lease agreements")
 
-# Setup configuration manager
-config_manager = ConfigurationManager()
+# Setup Jinja2 templates
 
 # Setup templates
 templates_dir = Path(__file__).parent / "templates"
@@ -198,21 +196,9 @@ app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request, config_id: Optional[str] = None):
-    # Load configuration if provided
-    config_data = None
-    if config_id:
-        config = config_manager.load_configuration(config_id)
-        if config:
-            config_data = config.model_dump(mode='json')
-    
-    # Get list of saved configurations
-    configurations = config_manager.list_configurations()
-    
+async def home(request: Request):
     return templates.TemplateResponse("form.html", {
-        "request": request,
-        "config_data": config_data,
-        "configurations": configurations
+        "request": request
     })
 
 
@@ -572,23 +558,15 @@ async def upload_template(request: Request, template_file: UploadFile = File(...
         # Convert to the format expected by the form
         config_data = template.model_dump(mode='json')
         
-        # Get saved configurations for display
-        configurations = config_manager.list_configurations()
-        
         return templates.TemplateResponse("form.html", {
             "request": request,
             "config_data": config_data,
-            "configurations": configurations,
             "upload_success": "Template loaded successfully!"
         })
         
     except Exception as e:
-        # Get configurations for display even on error
-        configurations = config_manager.list_configurations()
-        
         return templates.TemplateResponse("form.html", {
             "request": request,
-            "configurations": configurations,
             "upload_error": f"Error loading template: {str(e)}"
         })
 
@@ -686,20 +664,37 @@ async def generate_payment_schedule(
 
 
 
-@app.get("/configurations")
-async def list_configurations():
-    """API endpoint to get all configurations"""
-    return config_manager.list_configurations()
 
 
-@app.delete("/configurations/{config_id}")
-async def delete_configuration(config_id: str):
-    """API endpoint to delete a configuration"""
-    success = config_manager.delete_configuration(config_id)
-    if success:
-        return {"message": "Configuration deleted successfully"}
-    else:
-        return {"error": "Configuration not found"}, 404
+@app.post("/templates/load-example")
+async def load_example_template(request: Request):
+    """Load the example template"""
+    import json
+    import os
+    
+    # Path to the example template (go up from src/lease_generator/ to project root)
+    example_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "example_template.json")
+    
+    try:
+        with open(example_path, 'r') as f:
+            config_data = json.load(f)
+        
+        # Keep dates as strings for form rendering - they'll be converted to date objects when the form is submitted
+        return templates.TemplateResponse("form.html", {
+            "request": request, 
+            "config_data": config_data,
+            "upload_success": "Example template loaded successfully! You can now customize the form data."
+        })
+    except FileNotFoundError:
+        return templates.TemplateResponse("form.html", {
+            "request": request,
+            "error_message": "Example template file not found. Please ensure example_template.json exists in the project root."
+        })
+    except Exception as e:
+        return templates.TemplateResponse("form.html", {
+            "request": request,
+            "error_message": f"Error loading example template: {str(e)}"
+        })
 
 
 @app.get("/edit/{lease_id}")

@@ -277,22 +277,48 @@
         <!-- Template Upload Section -->
         {% if not config_data %}
         <div class="template-section">
-            <h3>📄 Upload JSON Template</h3>
-            <p>Load a previously saved configuration template:</p>
-            <form action="/templates/upload" method="post" enctype="multipart/form-data" style="margin-top: 15px;">
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="file" name="template_file" accept=".json" required style="flex: 1; padding: 10px; border: 2px solid #28a745; border-radius: 4px;">
-                    <button type="submit" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
-                        📤 Load Template
+            <h3>📄 Load Template</h3>
+            <p>Load a template to get started:</p>
+            
+            <!-- Example Template Button -->
+            <div style="margin: 15px 0;">
+                <form action="/templates/load-example" method="post" style="display: inline-block; margin-right: 15px;">
+                    <button type="submit" style="background-color: #17a2b8; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                        🏠 Load Example Template
                     </button>
-                </div>
-            </form>
+                </form>
+                <span style="color: #6c757d; font-size: 14px;">Start with sample data</span>
+            </div>
+            
+            <!-- Divider -->
+            <div style="text-align: center; margin: 20px 0; color: #6c757d; font-size: 14px;">
+                — or —
+            </div>
+            
+            <!-- Upload JSON Template -->
+            <div>
+                <p style="margin-bottom: 10px;">Upload your own JSON template:</p>
+                <form action="/templates/upload" method="post" enctype="multipart/form-data">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="file" name="template_file" accept=".json" required style="flex: 1; padding: 10px; border: 2px solid #28a745; border-radius: 4px;">
+                        <button type="submit" style="background-color: #28a745; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">
+                            📤 Upload Template
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
         {% endif %}
         
         {% if upload_success %}
         <div style="background-color: #d4edda; border: 2px solid #28a745; border-radius: 8px; padding: 15px; margin-bottom: 20px; color: #155724;">
             <strong>✅ Success!</strong> {{ upload_success }}
+        </div>
+        {% endif %}
+        
+        {% if error_message %}
+        <div style="background-color: #f8d7da; border: 2px solid #dc3545; border-radius: 8px; padding: 15px; margin-bottom: 20px; color: #721c24;">
+            <strong>❌ Error!</strong> {{ error_message }}
         </div>
         {% endif %}
         
