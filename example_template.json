@@ -1,0 +1,79 @@
+{
+  "parties": {
+    "landlord_name": "John Smith",
+    "landlord_address": "123 Main Street, Anytown, State 12345",
+    "tenant_name": "Jane Doe",
+    "tenant_address": "456 Oak Avenue, Anytown, State 12345",
+    "tenant_email": "jane.doe@email.com",
+    "has_occupants": false,
+    "occupants": null
+  },
+  "property_details": {
+    "mailing_address": "789 Rental Street, Unit 1, Anytown, State 12345",
+    "residence_type": "Apartment",
+    "bedrooms": 2,
+    "bathrooms": 1,
+    "furnished": false,
+    "appliances": [
+      "Refrigerator",
+      "Electric Stove",
+      "Dishwasher"
+    ]
+  },
+  "lease_terms": {
+    "start_date": "2025-01-01",
+    "end_date": "2025-12-31",
+    "monthly_rent": 1200.0,
+    "custom_security_deposit": null,
+    "security_deposit_details": null,
+    "pet_deposit": 200.0,
+    "late_fee": 50.0,
+    "nsf_fee": 35.0,
+    "payment_instructions": "Mail check to John Smith at 123 Main Street, Anytown, State 12345 OR pay online via [payment portal]"
+  },
+  "property_features": {
+    "parking_spaces": 1,
+    "utilities_included": [
+      "Water",
+      "Sewer",
+      "Trash"
+    ],
+    "smoking_allowed": false,
+    "pets_allowed": true,
+    "waterbed_allowed": false
+  },
+  "additional_terms": {
+    "early_termination_notice": 30,
+    "landlord_contact_phone": "555-123-4567",
+    "landlord_contact_email": "landlord@email.com",
+    "special_conditions": [
+      "Property Maintenance",
+      "- Tenant is responsible for basic upkeep including lawn care and snow removal",
+      "- Any maintenance requests must be submitted in writing",
+      "Noise Policy", 
+      "- Quiet hours are from 10:00 PM to 8:00 AM",
+      "- No loud music or parties that disturb neighbors",
+      "Pet Policy",
+      "- Maximum of 2 pets allowed with landlord approval",
+      "- Pet deposit and monthly pet rent may apply",
+      "- Tenant responsible for all pet-related damages",
+      "Parking",
+      "- One assigned parking space included",
+      "- Guest parking available on first-come basis",
+      "Property Inspections",
+      "- Annual inspection with 48-hour notice",
+      "- Move-in and move-out inspections required"
+    ],
+    "payment_schedule": {
+      "include_in_lease": true,
+      "auto_generate": true,
+      "custom_entries": [],
+      "rent_increases": [],
+      "lease_start_comment": null
+    }
+  },
+  "governing_law_state": "Vermont",
+  "lead_paint_disclosure": false,
+  "created_at": "2025-08-28T00:00:00.000000",
+  "updated_at": "2025-08-28T00:00:00.000000"
+}
