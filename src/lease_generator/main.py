@@ -7,7 +7,6 @@ from datetime import date, datetime, timedelta
 from typing import List, Optional
 import json
 from pathlib import Path
-import calendar
 
 from .models import (
     LeaseAgreement, LeaseParties, PropertyDetails, 
